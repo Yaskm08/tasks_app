@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}To-Do List{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">To-Do List</h1>
+<a href="{{ url_for('new_task') }}" class="btn btn-primary mb-3">Add New Task</a>
+
+{% if tasks %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Due Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="task-list">
+      {% for task in tasks %}
+      <tr class="draggable-task">
+        <td>{{ task.title }}</td>
+        <td>
+          {% if task.completed %}
+            <span class="badge bg-success">Completed</span>
+          {% else %}
+            <span class="badge bg-warning text-dark">Pending</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if task.due_date %}
+            {{ task.due_date.strftime('%Y-%m-%d') }}
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+        <td>
+          <form action="{{ url_for('toggle_task', task_id=task.id) }}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-sm btn-info">Toggle Status</button>
+          </form>
+          <a href="{{ url_for('update_task', task_id=task.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+          <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post" class="d-inline delete-form">
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No tasks yet! Click "Add New Task" to create one.</p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+{% endblock %}

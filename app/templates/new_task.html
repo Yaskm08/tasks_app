@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Add New Task{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh; background: linear-gradient(135deg, #667eea, #764ba2);">
+  <div class="card p-4 shadow" style="width: 100%; max-width: 400px; border-radius: 15px;">
+    <div class="card-body">
+      <h3 class="card-title text-center mb-4" style="font-weight: bold; color: #333;">Create New Task</h3>
+      <form method="POST" action="{{ url_for('new_task') }}">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.title.label(class="form-label") }}
+          {{ form.title(class="form-control", placeholder="Enter task title") }}
+        </div>
+        <div class="mb-3">
+          {{ form.description.label(class="form-label") }}
+          {{ form.description(class="form-control", rows="3", placeholder="Enter task description") }}
+        </div>
+        <div class="mb-3">
+          {{ form.due_date.label(class="form-label") }}
+          {{ form.due_date(class="form-control", type="date") }}
+        </div>
+        <button type="submit" class="btn btn-primary w-100" style="background: #667eea; border: none;">Create Task</button>
+      </form>
+      <p class="mt-3 text-center" style="font-size: 0.9em;">
+        <a href="{{ url_for('index') }}">Back to Task List</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
