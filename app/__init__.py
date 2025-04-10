@@ -1,15 +1,19 @@
 import os
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-
+from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from sqlalchemy import MetaData
-from config import Config
 from flask_dance.contrib.google import make_google_blueprint
 
-# Define a naming convention for database constraints.
+# Load environment variables from .env file
+load_dotenv()
+
+# Allow insecure transport for development only (not for production)
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
+# Define naming convention for SQLAlchemy (helps with migrations)
 naming_convention = {
     "ix": "ix_%(column_0_label)s",
     "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -18,24 +22,24 @@ naming_convention = {
     "pk": "pk_%(table_name)s"
 }
 
-# Create the Flask app instance.
+# Initialize Flask app
 app = Flask(__name__)
-app.config.from_object(Config)
+app.config.from_object("config.Config")
 
-# Initialize SQLAlchemy with the naming convention.
+# Initialize database with naming convention
 db = SQLAlchemy(app, metadata=MetaData(naming_convention=naming_convention))
 
-# Set up Flask-Login.
+# Setup login manager
 login = LoginManager(app)
 login.login_view = 'login'
 
-# Set up Flask-Migrate.
+# Setup database migrations
 migrate = Migrate(app, db)
 
-# Set up the Google OAuth blueprint with updated scopes.
+# Google OAuth Blueprint setup using environment variables (secure)
 google_bp = make_google_blueprint(
-    client_id="391640039677-r8q9jf4p3j99qknvoid2tk4k1aabva1i.apps.googleusercontent.com",
-    client_secret="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",
+    client_id=os.getenv("GOOGLE_OAUTH_CLIENT_ID"),
+    client_secret=os.getenv("GOOGLE_OAUTH_CLIENT_SECRET"),
     scope=[
         "openid",
         "https://www.googleapis.com/auth/userinfo.profile",
@@ -45,5 +49,5 @@ google_bp = make_google_blueprint(
 )
 app.register_blueprint(google_bp, url_prefix="/login")
 
-# Import models and routes to avoid circular imports.
+# Import models and routes (placed here to avoid circular imports)
 from app import models, routes
